@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+:root {
+    /* Дефолт цвет */
+    --color-bg: #09090b; /* zinc-950 */
+    --color-surface: #18181b; /* zinc-900 */
+    --color-muted: #a1a1aa; /* zinc-400 */
+    --color-border: #27272a; /* zinc-800 */
+    --color-text: #e4e4e7; /* zinc-200 */
+
+    /* Ключевой цвет */
+    --color-primary-from: #c026d3; /* fuchsia-600 */
+    --color-primary-to: #0369a1; /* sky-800 */
+    --color-primary-hover-from: #a21caf; /* fuchsia-700 */
+    --color-primary-hover-to: #0ea5e9; /* sky-500 */
+    --color-primary-outline: #d946ef; /* fuchsia-500 */
+    --color-primary-disabled: #4c1d95; /* purple-900 */
+
+    /* Доп */
+    --color-ghost-hover: rgba(244, 244, 245, 0.08); /* zinc-100 with opacity */
+    --color-danger: #f87171; /* red-400 */
+    --color-danger-strong: #ef4444; /* red-500 */
+
+    /* Сайдбар */
+    --sidebar-open: 250px;
+}
+
+body {
+    font-family: var(--font-body), "Inter", system-ui, -apple-system,
+        BlinkMacSystemFont, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    display: flex;
+}
+
+.feature-font {
+    font-family: var(--font-highlight), "JetBrains Mono", SFMono-Regular, Menlo,
+        Monaco, Consolas, monospace;
+    letter-spacing: 0.02em;
+}
