@@ -1,11 +1,28 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/shared/ui";
-import { PanelLeftClose, PanelRightOpen, Plus } from "lucide-react";
+import { UserInfoCard } from "@/widgets/UserInfo";
+import { PanelRightOpen, PanelLeftOpen, Plus } from "lucide-react";
 import { useSidebarStore } from "../model/sidebarStore";
 
+const toggleButtonBase =
+    "fixed top-6 z-40 h-11 w-11 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] shadow-xl transition-all duration-300 ease-out";
+
+const navItems = [
+    { href: "/", label: "Главная" },
+    { href: "/videos", label: "Видео" },
+];
+
 export default function SideBar() {
+    const router = useRouter();
+    const pathname = usePathname();
     const { open, toggleSidebar } = useSidebarStore();
+
+    const handleCreateVideo = () => {
+        router.push("/create");
+    };
 
     return (
         <>
@@ -13,42 +30,63 @@ export default function SideBar() {
                 onClick={toggleSidebar}
                 size="rounded"
                 variant="ghost"
-                className={`fixed left-4 top-4 z-40 h-12 w-12 shadow-lg transition-all duration-300 ease-out ${
+                aria-label={open ? "Скрыть сайдбар" : "Открыть сайдбар"}
+                className={`${toggleButtonBase} left-0 ${
                     open
-                        ? "pointer-events-none -translate-x-2 opacity-0"
-                        : "pointer-events-auto translate-x-0 opacity-100"
+                        ? "translate-x-[calc(var(--sidebar-open)+1rem)]"
+                        : "translate-x-4"
                 }`}
             >
-                <PanelRightOpen size={22} />
+                {open ? (
+                    <PanelLeftOpen size={22} />
+                ) : (
+                    <PanelRightOpen size={22} />
+                )}
             </Button>
 
-            <aside
-                className={`${
-                    open
-                        ? "w-[var(--sidebar-open)] translate-x-0 opacity-100 pointer-events-auto border-[var(--color-border)]"
-                        : "w-0 -translate-x-full opacity-0 pointer-events-none border-transparent"
-                } h-screen shrink-0 overflow-hidden border-r bg-[var(--color-surface)] p-3 transition-all duration-300 ease-out flex flex-col`}
+            <div
+                className={`relative shrink-0 overflow-visible transition-[width] duration-300 ease-in-out ${
+                    open ? "w-[var(--sidebar-open)]" : "w-0"
+                }`}
             >
-                <div className="flex justify-between">
-                    <Button
-                        size="rounded"
-                        variant="primary"
-                        className="w-[70%]"
-                    >
-                        New chat
-                        <Plus size={20} />
-                    </Button>
-                    <Button
-                        onClick={toggleSidebar}
-                        size="rounded"
-                        className="p-2 w-12 h-12"
-                        variant="ghost"
-                        aria-label="Закрыть боковую панель"
-                    >
-                        <PanelLeftClose size={24} />
-                    </Button>
-                </div>
-            </aside>
+                <aside
+                    className={`${
+                        open
+                            ? "translate-x-0 opacity-100 pointer-events-auto border-[var(--color-border)]"
+                            : "-translate-x-full opacity-0 pointer-events-none border-transparent"
+                    } fixed left-0 top-0 z-30 h-screen w-[var(--sidebar-open)] overflow-hidden border-r bg-[var(--color-surface)] p-4 transition-[transform,opacity] duration-300 ease-in-out flex flex-col gap-4`}
+                >
+                    <div className="flex items-center justify-between gap-3">
+                        <Button
+                            size="lg"
+                            variant="primary"
+                            className="flex-1"
+                            onClick={handleCreateVideo}
+                        >
+                            Создать видео
+                            <Plus size={20} />
+                        </Button>
+                    </div>
+
+                    <nav className="flex-1 space-y-2">
+                        {navItems.map((item) => (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`block rounded-2xl border px-4 py-3 text-sm font-medium transition ${
+                                    pathname === item.href
+                                        ? "border-[var(--color-text)] bg-[var(--color-text)]/10 text-[var(--color-text)]"
+                                        : "border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-border)] hover:bg-[var(--color-border)]/30"
+                                }`}
+                            >
+                                {item.label}
+                            </Link>
+                        ))}
+                    </nav>
+
+                    <UserInfoCard />
+                </aside>
+            </div>
         </>
     );
 }

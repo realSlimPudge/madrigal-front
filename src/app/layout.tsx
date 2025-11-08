@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "@/appFsd/styles/globals.css";
 import { SideBar } from "@/widgets/Sidebar";
+import { AuthLifecycleProvider } from "@/app/providers/AuthLifecycleProvider";
 
 const calmFont = Inter({
     variable: "--font-body",
@@ -32,10 +33,12 @@ export default function RootLayout({
             <body
                 className={`${calmFont.variable} ${highlightFont.variable} flex min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] antialiased`}
             >
-                <SideBar />
-                <main className="flex-1 min-h-screen transition-[width] duration-300 ease-out">
-                    {children}
-                </main>
+                <AuthLifecycleProvider>
+                    <SideBar />
+                    <main className="flex-1 min-h-screen transition-[width] duration-300 ease-out">
+                        {children}
+                    </main>
+                </AuthLifecycleProvider>
             </body>
         </html>
     );

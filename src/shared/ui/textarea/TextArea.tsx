@@ -1,6 +1,9 @@
-import { forwardRef, InputHTMLAttributes, useId } from "react";
+"use client";
 
-export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+import { forwardRef, useId } from "react";
+import TextareaAutosize, { TextareaAutosizeProps } from "react-textarea-autosize";
+
+export interface TextAreaProps extends TextareaAutosizeProps {
     label?: string;
     helperText?: string;
     error?: string;
@@ -15,27 +18,31 @@ const errorStyles =
 const joinClasses = (...classes: Array<string | false | undefined>) =>
     classes.filter(Boolean).join(" ");
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ label, helperText, error, className, id, ...props }, ref) => {
+export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
+    (
+        { label, helperText, error, className, id, minRows = 3, ...props },
+        ref
+    ) => {
         const generatedId = useId();
-        const inputId = id ?? generatedId;
-        const helperId = helperText ? `${inputId}-helper` : undefined;
-        const errorId = error ? `${inputId}-error` : undefined;
+        const textareaId = id ?? generatedId;
+        const helperId = helperText ? `${textareaId}-helper` : undefined;
+        const errorId = error ? `${textareaId}-error` : undefined;
         const describedBy = error ? errorId : helperId;
 
         return (
-            <div className="space-y-1.5  text-[var(--color-text)]">
+            <div className="space-y-1.5 text-[var(--color-text)]">
                 {label && (
                     <label
-                        htmlFor={inputId}
+                        htmlFor={textareaId}
                         className="text-sm font-medium text-[var(--color-text)]"
                     >
                         {label}
                     </label>
                 )}
-                <input
-                    id={inputId}
+                <TextareaAutosize
+                    id={textareaId}
                     ref={ref}
+                    minRows={minRows}
                     className={joinClasses(
                         baseStyles,
                         error && errorStyles,
@@ -46,10 +53,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                     {...props}
                 />
                 {error ? (
-                    <p
-                        id={errorId}
-                        className="text-sm text-[var(--color-danger)]"
-                    >
+                    <p id={errorId} className="text-sm text-[var(--color-danger)]">
                         {error}
                     </p>
                 ) : (
@@ -67,4 +71,4 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     }
 );
 
-Input.displayName = "Input";
+TextArea.displayName = "TextArea";
