@@ -9,7 +9,7 @@ import { LogOut } from "lucide-react";
 export function UserInfoCard() {
     const user = useAuthUserStore((state) => state.user);
     const hydrate = useAuthUserStore((state) => state.hydrate);
-    const { logout, isLoading, error } = useLogout();
+    const { logout, isLoading } = useLogout();
 
     useEffect(() => {
         hydrate();
@@ -39,22 +39,19 @@ export function UserInfoCard() {
                 </p>
                 <p className="mt-1 font-semibold break-all">{user.email}</p>
             </div>
-            <Button
-                type="button"
-                variant="secondary"
-                size="md"
-                className="w-full"
-                onClick={handleLogout}
-                disabled={isLoading}
-            >
-                {isLoading ? "Выходим..." : "Выйти"}
-                <LogOut size={16} />
-            </Button>
-            {error && (
-                <p className="text-xs text-[var(--color-danger)]">
-                    {error.message || "Не удалось выйти"}
-                </p>
-            )}
+            <div className="space-y-2">
+                <Button
+                    type="button"
+                    variant="secondary"
+                    size="md"
+                    className="w-full"
+                    onClick={handleLogout}
+                    disabled={isLoading}
+                >
+                    {isLoading ? "Выходим..." : "Выйти"}
+                    <LogOut size={16} />
+                </Button>
+            </div>
         </div>
     );
 }

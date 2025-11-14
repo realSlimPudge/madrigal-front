@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
-import "@/appFsd/styles/globals.css";
+import "./styles/globals.css";
 import { SideBar } from "@/widgets/Sidebar";
 import { AuthLifecycleProvider } from "@/app/providers/AuthLifecycleProvider";
 
@@ -31,7 +31,7 @@ export default function RootLayout({
     return (
         <html lang="ru">
             <body
-                className={`${calmFont.variable} ${highlightFont.variable} flex min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] antialiased`}
+                className={`${calmFont.variable} ${highlightFont.variable} flex min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] antialiased overflow-x-hidden`}
             >
                 <AuthLifecycleProvider>
                     <SideBar />

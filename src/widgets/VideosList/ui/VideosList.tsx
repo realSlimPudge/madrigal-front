@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import useSWR from "swr";
+import { RefreshCcw } from "lucide-react";
 import { fetchVideos } from "@/entities/video/api/videos";
 import type { VideoJob } from "@/entities/video";
 
@@ -41,8 +42,19 @@ export function VideosList() {
 
     if (isLoading) {
         return (
-            <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)]/80 p-8 text-center text-[var(--color-muted)]">
-                Загружаем список видео...
+            <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <div className="h-6 w-40 animate-pulse rounded-full bg-white/10" />
+                        <div className="mt-2 h-4 w-64 animate-pulse rounded-full bg-white/5" />
+                    </div>
+                    <div className="h-4 w-24 animate-pulse rounded-full bg-white/5" />
+                </div>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {Array.from({ length: 6 }).map((_, index) => (
+                        <VideoCardSkeleton key={index} />
+                    ))}
+                </div>
             </div>
         );
     }
@@ -83,9 +95,10 @@ export function VideosList() {
                 </div>
                 <button
                     onClick={() => mutate()}
-                    className="text-sm text-[var(--color-muted)] underline-offset-4 hover:underline"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-muted)] transition hover:text-[var(--color-text)]"
+                    aria-label="Обновить список видео"
                 >
-                    Обновить
+                    <RefreshCcw size={16} />
                 </button>
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-3/4">
@@ -105,7 +118,7 @@ function VideoCard({ video }: { video: VideoJob }) {
             href={`/videos/${video.id}`}
             className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface)]/80 shadow-[0_25px_80px_rgba(0,0,0,0.45)] transition hover:-translate-y-1 hover:border-[var(--color-border)]/60"
         >
-            <div className="relative aspect-[4/5] w-full overflow-hidden">
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[28px]">
                 {video.video_url ? (
                     <video
                         key={video.video_url}
@@ -121,7 +134,7 @@ function VideoCard({ video }: { video: VideoJob }) {
                         className={`absolute inset-0 bg-gradient-to-br ${coverClass}`}
                     />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 transition group-hover:from-[rgba(192,38,211,0.5)] group-hover:via-[rgba(3,105,161,0.35)] group-hover:to-transparent" />
                 <div className="absolute top-3 right-3 rounded-full bg-black/40 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
                     {video.status}
                 </div>
@@ -143,5 +156,23 @@ function VideoCard({ video }: { video: VideoJob }) {
                 <span>{video.duration_seconds} сек</span>
             </div>
         </Link>
+    );
+}
+
+function VideoCardSkeleton() {
+    return (
+        <div className="flex h-full flex-col overflow-hidden rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface)]/60 shadow-[0_25px_80px_rgba(0,0,0,0.3)]">
+            <div className="relative aspect-[4/5] w-full overflow-hidden">
+                <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-[#1f1f23] via-[#121212] to-[#1f1f23]" />
+                <div className="absolute bottom-4 left-4 right-4 space-y-3">
+                    <div className="h-5 w-3/4 animate-pulse rounded-full bg-white/10" />
+                    <div className="h-5 w-2/3 animate-pulse rounded-full bg-white/10" />
+                </div>
+            </div>
+            <div className="flex items-center justify-between px-4 py-4 text-sm text-[var(--color-muted)]">
+                <div className="h-4 w-20 animate-pulse rounded-full bg-white/5" />
+                <div className="h-4 w-12 animate-pulse rounded-full bg-white/5" />
+            </div>
+        </div>
     );
 }

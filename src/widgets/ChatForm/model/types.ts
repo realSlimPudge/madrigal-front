@@ -1,23 +1,23 @@
 export type PromptPayload = {
     idea: string;
-    tone: string;
-    language: string;
-    target_audience: string;
+    style: string;
     duration_seconds: number;
-    num_scenes: number;
-    visual_style: string;
-    constraints: string[];
+    language: string;
+    template_id: string;
+    voice_id: string;
+    soundtrack: string;
+    soundtrack_url: string;
+    background_video_url?: string;
 };
 
 export type ChatFormState = {
     idea: string;
-    tone: string;
-    language: string;
-    target_audience: string;
+    style: string;
     duration_seconds: string;
-    num_scenes: string;
-    visual_style: string;
-    constraintsText: string;
+    language: string;
+    voice_id: string;
+    soundtrack: string;
+    soundtrack_url: string;
+    generationMode: "storyboard" | "video";
+    background_video_url: string;
 };
-
-export type CopyStatus = "idle" | "copied";

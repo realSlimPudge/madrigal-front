@@ -13,12 +13,17 @@ const request = async <T>(
     init: RequestInit = {},
     attempt = 0
 ) => {
+    const isFormData = init.body instanceof FormData;
+    const headers = isFormData
+        ? init.headers
+        : {
+              "Content-Type": "application/json",
+              ...init.headers,
+          };
+
     const response = await fetch(`${api}${url}`, {
         ...init,
-        headers: {
-            "Content-Type": "application/json",
-            ...init.headers,
-        },
+        headers,
         credentials: init.credentials ?? "include",
     });
 
@@ -46,6 +51,12 @@ const request = async <T>(
 };
 
 export const post = <T, B>(url: string, body: B) =>
-    request<T>(url, { method: "POST", body: JSON.stringify(body) });
+    request<T>(url, {
+        method: "POST",
+        body:
+            body instanceof FormData
+                ? (body as FormData)
+                : JSON.stringify(body),
+    });
 
 export const get = <T>(url: string) => request<T>(url);

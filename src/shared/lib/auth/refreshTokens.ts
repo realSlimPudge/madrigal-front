@@ -3,7 +3,7 @@
 import { API_CONFIG } from "@/shared/config";
 import { useAuthUserStore } from "@/entities/user";
 import {
-    getAccessTokenFromCookies,
+    clearRefreshToken,
     getRefreshToken,
     setRefreshToken,
 } from "@/shared/lib/tokens/refreshToken";
@@ -22,9 +22,8 @@ export const refreshTokens = async (): Promise<boolean> => {
     if (refreshPromise) return refreshPromise;
 
     const refresh_token = getRefreshToken();
-    const access_token = getAccessTokenFromCookies();
 
-    if (!refresh_token || !access_token) {
+    if (!refresh_token) {
         return false;
     }
 
@@ -34,7 +33,7 @@ export const refreshTokens = async (): Promise<boolean> => {
             "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ refresh_token, access_token }),
+        body: JSON.stringify({ refresh_token }),
     })
         .then(async (response) => {
             if (!response.ok) {
@@ -49,7 +48,10 @@ export const refreshTokens = async (): Promise<boolean> => {
             }
             return true;
         })
-        .catch(() => false)
+        .catch(() => {
+            clearRefreshToken();
+            return false;
+        })
         .finally(() => {
             refreshPromise = null;
         });

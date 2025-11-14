@@ -2,22 +2,17 @@
 
 import { FormEvent, useCallback, useMemo, useState } from "react";
 import { useCreateVideo } from "@/feauters/videos/create";
-import { createSampleFormState, samplePayload } from "./constants";
+import { defaultFormState } from "./constants";
 import { toPayload } from "./utils";
-import type { ChatFormState, CopyStatus, PromptPayload } from "./types";
-
-const COPY_RESET_DELAY = 2000;
+import type { ChatFormState } from "./types";
+import type { VideoJob } from "@/entities/video";
 
 export const useChatForm = () => {
-    const [form, setForm] = useState<ChatFormState>(() =>
-        createSampleFormState()
-    );
-    const [submittedPayload, setSubmittedPayload] =
-        useState<PromptPayload>(samplePayload);
-    const [copyStatus, setCopyStatus] = useState<CopyStatus>("idle");
+    const [form, setForm] = useState<ChatFormState>(defaultFormState);
     const [successMessage, setSuccessMessage] = useState("");
     const { createVideo, error: submitError, isLoading: isSubmitting } =
         useCreateVideo();
+    const [createdJob, setCreatedJob] = useState<VideoJob | null>(null);
 
     const handleFieldChange = useCallback(
         (field: keyof ChatFormState, value: string) => {
@@ -29,24 +24,22 @@ export const useChatForm = () => {
         []
     );
 
-    const handleNumberChange = useCallback(
-        (field: "duration_seconds" | "num_scenes", value: string) => {
-            const sanitized = value.replace(/[^0-9]/g, "");
-            handleFieldChange(field, sanitized);
-        },
-        [handleFieldChange]
-    );
+    const handleNumberChange = useCallback((value: string) => {
+        const sanitized = value.replace(/[^0-9]/g, "");
+        handleFieldChange("duration_seconds", sanitized);
+    }, [handleFieldChange]);
 
     const handleSubmit = useCallback(
         async (event: FormEvent<HTMLFormElement>) => {
             event.preventDefault();
             setSuccessMessage("");
             const payload = toPayload(form);
-            setSubmittedPayload(payload);
-            setCopyStatus("idle");
 
             try {
-                await createVideo(payload);
+                const response = await createVideo(payload);
+                if (response?.job) {
+                    setCreatedJob(response.job);
+                }
                 setSuccessMessage("Запрос на генерацию видео отправлен");
             } catch {
                 // ошибка придет в submitError
@@ -55,47 +48,41 @@ export const useChatForm = () => {
         [createVideo, form]
     );
 
-    const handleFillSample = useCallback(() => {
-        setForm(createSampleFormState());
-        setSubmittedPayload(samplePayload);
-        setCopyStatus("idle");
-        setSuccessMessage("");
-    }, []);
-
-    const handleCopy = useCallback(async () => {
-        const text = JSON.stringify(submittedPayload, null, 2);
-        try {
-            if (navigator?.clipboard?.writeText) {
-                await navigator.clipboard.writeText(text);
-                setCopyStatus("copied");
-                setTimeout(() => setCopyStatus("idle"), COPY_RESET_DELAY);
-            }
-        } catch {
-            setCopyStatus("idle");
-        }
-    }, [submittedPayload]);
-
-    const isSubmitDisabled = useMemo(
-        () =>
-            !form.idea.trim() ||
-            !form.language.trim() ||
-            !form.tone.trim() ||
-            !form.target_audience.trim(),
-        [form]
-    );
+    const isSubmitDisabled = useMemo(() => {
+        const hasIdea = Boolean(form.idea.trim());
+        const hasStyle = Boolean(form.style.trim());
+        const hasDuration = Boolean(form.duration_seconds.trim());
+        const hasVoice = Boolean(form.voice_id);
+        const hasSoundtrack = Boolean(form.soundtrack_url);
+        const needsVideo = form.generationMode === "video";
+        const hasBackgroundVideo = !needsVideo || Boolean(form.background_video_url);
+        return !(
+            hasIdea &&
+            hasStyle &&
+            hasDuration &&
+            hasVoice &&
+            hasSoundtrack &&
+            hasBackgroundVideo
+        );
+    }, [
+        form.background_video_url,
+        form.duration_seconds,
+        form.generationMode,
+        form.idea,
+        form.soundtrack_url,
+        form.style,
+        form.voice_id,
+    ]);
 
     return {
         form,
-        copyStatus,
-        submittedPayload,
         successMessage,
+        createdJob,
         isSubmitDisabled,
         isSubmitting,
         submitError,
         handleFieldChange,
         handleNumberChange,
         handleSubmit,
-        handleFillSample,
-        handleCopy,
     };
 };

@@ -3,13 +3,14 @@ import type { VideoJob } from "@/entities/video";
 
 export interface CreateVideoDto {
     idea: string;
-    tone: string;
-    language: string;
-    target_audience: string;
+    style: string;
     duration_seconds: number;
-    num_scenes: number;
-    visual_style: string;
-    constraints: string[];
+    language: string;
+    template_id: string;
+    voice_id: string;
+    soundtrack: string;
+    soundtrack_url: string;
+    background_video_url?: string;
 }
 
 export interface CreateVideoResponse {
